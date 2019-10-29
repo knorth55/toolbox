@@ -11,7 +11,8 @@ record_axis_help() {
   echo "    --id: authentication user id"
   echo "    --pass: authentication user password"
   echo "  Quality"
-  echo "    --resolution: video resolution (default 1280x1080)"
+  echo "    --width: video width (default 640)"
+  echo "    --height: video height (default 480)"
   echo "    --rate: video rate (defualt: 2)"
   echo "    --quality: quality for encoding to h264 (default: 21)"
   echo "  Other"
@@ -31,7 +32,8 @@ check_package() {
 record_axis() {
   SOUP_OPTION="is-live=true"
   ADDRESS="localhost"
-  RESOLUTION="1280x1024"
+  WIDTH="640"
+  HEIGHT="480"
   RATE="2"
   QUALITY="21"
   OUT="out"
@@ -65,8 +67,12 @@ record_axis() {
         SOUP_OPTION="$SOUP_OPTION user-pw=$2"
         shift
         ;;
-      --resolution)
-        RESOLUTION=$2
+      --width)
+        width=$2
+        shift
+        ;;
+      --height)
+        HEIGHT=$2
         shift
         ;;
       --rate|-r)
@@ -91,22 +97,23 @@ record_axis() {
     esac
   done
   #
-  local location="http://$ADDRESS/axis-cgi/mjpg/video.cgi?resolution=$RESOLUTION"
+  local location="http://$ADDRESS/axis-cgi/mjpg/video.cgi?resolution=$WIDTHx$HEIGHT"
   local max_size_time=$(($SPLIT_TIME * 1000 * 1000 * 1000))
   #
   echo "input: $location"
   echo "output: $OUT"
   echo "max_size_time: $max_size_time"
   echo "max_file: $MAX_FILE"
-  #
   $CMD gst-launch-1.0 -v\
        souphttpsrc location=${location} ${SOUP_OPTION} !\
-       queue !\
-       multipartdemux !\
-       image/jpeg,framerate=\(fraction\)${RATE}/1 !\
+       image/jpeg,width=$WIDTH,height=$HEIGHT,framerate=\(fraction\)${RATE}/1 !\
        jpegdec !\
        videorate !\
-       video/x-raw, framerate=\(fraction\)1/1 !\
+       videoscale !\
+       video/x-raw,width=$WIDTH,height=$HEIGHT,framerate=\(fraction\)1/1 !\
+       videoconvert !\
+       queue !\
+       clockoverlay !\
        x264enc pass=quant quantizer=$QUALITY tune=zerolatency !\
        h264parse !\
        splitmuxsink location="${OUT}_%05d.avi" max-size-time=${max_size_time} max-files=${MAX_FILE} muxer=avimux
