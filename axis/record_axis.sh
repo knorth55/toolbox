@@ -104,11 +104,12 @@ record_axis() {
        queue !\
        multipartdemux !\
        image/jpeg,framerate=\(fraction\)${RATE}/1 !\
-       jpegparse !\
        jpegdec !\
-       videoconvert !\
-       x264enc pass=quant quantizer=$QUALITY !\
-       splitmuxsink location="${OUT}_%05d.mp4" max-size-time=${max_size_time} max-files=${MAX_FILE} muxer=mp4mux
+       videorate !\
+       video/x-raw, framerate=\(fraction\)1/1 !\
+       x264enc pass=quant quantizer=$QUALITY tune=zerolatency !\
+       h264parse !\
+       splitmuxsink location="${OUT}_%05d.avi" max-size-time=${max_size_time} max-files=${MAX_FILE} muxer=avimux
 }
 
 if  check_package gstreamer1.0-tools &&
