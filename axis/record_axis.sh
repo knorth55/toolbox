@@ -105,12 +105,12 @@ record_axis() {
   echo "max_size_time: $max_size_time"
   echo "max_file: $MAX_FILE"
   $CMD gst-launch-1.0 -v\
-       souphttpsrc location=${location} ${SOUP_OPTION} !\
+       souphttpsrc location=${location} ${SOUP_OPTION} do-timestamp=true !\
        image/jpeg,width=$WIDTH,height=$HEIGHT,framerate=\(fraction\)${RATE}/1 !\
        jpegdec !\
        videorate !\
        videoscale !\
-       video/x-raw,width=$WIDTH,height=$HEIGHT,framerate=\(fraction\)1/1 !\
+       video/x-raw,width=$WIDTH,height=$HEIGHT,framerate=\(fraction\)${RATE}/1 !\
        videoconvert !\
        queue !\
        clockoverlay !\
