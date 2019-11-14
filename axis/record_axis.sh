@@ -30,7 +30,7 @@ check_package() {
 }
 
 record_axis() {
-  SOUP_OPTION="is-live=true"
+  SOUP_OPTION="is-live=true do-timestamp=true retries=-1 timeout=0"
   ADDRESS="localhost"
   WIDTH="640"
   HEIGHT="480"
@@ -105,7 +105,7 @@ record_axis() {
   echo "max_size_time: $max_size_time"
   echo "max_file: $MAX_FILE"
   $CMD gst-launch-1.0 -v\
-       souphttpsrc location=${location} ${SOUP_OPTION} do-timestamp=true !\
+       souphttpsrc location=${location} ${SOUP_OPTION} !\
        image/jpeg,width=$WIDTH,height=$HEIGHT,framerate=\(fraction\)${RATE}/1 !\
        jpegdec !\
        videorate !\
