@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # lock by pid
-PIDFILE=/var/run/mongodump_backup_to_qnap.pid
+# PIDFILE=/var/run/mongodump_backup_to_qnap.pid
+PIDFILE=/var/run/rsync_backup_to_qnap.pid
 if [ -f $PIDFILE ]; then
     PID=$(cat $PIDFILE)
     ps -p $PID > /dev/null 2>&1
@@ -25,6 +26,6 @@ else
     fi
 fi
 
-# exec rsync -auvhzP /media/mongo2/mongodb_store /media/qnap/
-sudo mongodump -v --host musca:27017 --out /media/qnap/mongodb_store_dump
+exec rsync --inplace -auvhP /media/mongo2/mongodb_store /media/qnap/
+# sudo mongodump -v --host musca:27017 --out /media/qnap/mongodb_store_dump
 rm -f $PIDFILE
