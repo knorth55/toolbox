@@ -26,6 +26,6 @@ else
     fi
 fi
 
-exec rsync --inplace -auvhP /media/mongo2/mongodb_store /media/qnap/
+exec rsync --inplace -auvhP /media/mongo2/mongodb_store /media/qnap/mongodb_store_dump/
 # sudo mongodump -v --host musca:27017 --out /media/qnap/mongodb_store_dump
 rm -f $PIDFILE
